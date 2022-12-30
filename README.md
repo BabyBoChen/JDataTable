@@ -11,13 +11,13 @@ Connection conn = DriverManager.getConnection(connString);
 Statement stmt = conn.createStatement();
 String sql = "SELECT * FROM albums";
 ResultSet rs = stmt.executeQuery(sql);
-DataTable dt = DataTable.FromResultSet(rs);  // <------- convert ResultSet to DataTable
+DataTable dt = DataTable.fromResultSet(rs);  // <------- convert ResultSet to DataTable
 rs.close();
 stmt.close();
 conn.close();
 
 //Insert new row
-DataRow newRow = dt.NewRow();
+DataRow newRow = dt.newRow();
 newRow.SetCellValue("AlbumId", 999);
 newRow.SetCellValue("Title", "Test1");
 newRow.SetCellValue("ArtistId", 1);
