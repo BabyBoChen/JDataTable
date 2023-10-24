@@ -8,7 +8,7 @@ public enum DataRowVersion {
 		this.value = value;
 	}
 	
-	public int GetValue() {
+	public int getValue() {
 		return this.value;
 	}
 }

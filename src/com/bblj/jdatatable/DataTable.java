@@ -4,7 +4,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.sql.Types;
 
 public class DataTable {
 	
@@ -36,14 +39,14 @@ public class DataTable {
 	
 	public DataTable() {}
 	
-	public static DataTable FromResultSet(ResultSet rs) throws SQLException {
+	public static DataTable fromResultSet(ResultSet rs) throws SQLException {
 		DataTable dt = new DataTable();
-		dt.PopulateColumns(rs);
-		dt.FillRows(rs);
+		dt.populateColumns(rs);
+		dt.fillRows(rs);
 		return dt;
 	}
 
-	private void PopulateColumns(ResultSet rs) throws SQLException {
+	private void populateColumns(ResultSet rs) throws SQLException {
 		ResultSetMetaData schema = rs.getMetaData();
 		int colCnt = schema.getColumnCount();
 		for(int i = 1; i <= colCnt; i++) {
@@ -59,7 +62,7 @@ public class DataTable {
 				DataColumn col = new DataColumn();
 				col.setTable(this);
 				col.setColumnName(colName);
-				Class<?> dataType = DataTable.GetDataTypeFromSqlType(schema.getColumnType(i));
+				Class<?> dataType = DataTable.getDataTypeFromSqlType(schema.getColumnType(i));
 				col.setDatatype(dataType);
 				this.columns.add(col);
 			}
@@ -67,49 +70,48 @@ public class DataTable {
 		
 	}
 
-	private static Class<?> GetDataTypeFromSqlType(int columnType) {
+	private static Class<?> getDataTypeFromSqlType(int columnType) {
+		
 		Class<?> type = null;
-		if(columnType == 2) {
+		if(columnType == Types.NUMERIC) {
 			type = java.math.BigDecimal.class;
-		} else if(columnType == 2) {
-			type = java.math.BigDecimal.class;
-		} else if(columnType == -7) {
+		} else if(columnType == Types.BIT) {
 			type = boolean.class;
-		} else if(columnType == -6) {
+		} else if(columnType == Types.TINYINT) {
 			type = int.class;
-		} else if(columnType == 5) {
+		} else if(columnType == Types.SMALLINT) {
 			type = int.class;
-		} else if(columnType == 4) {
+		} else if(columnType == Types.INTEGER) {
 			type = int.class;
-		} else if(columnType == -5) {
+		} else if(columnType == Types.BIGINT) {
 			type = long.class;
-		} else if(columnType == 7) {
+		} else if(columnType == Types.REAL) {
 			type = float.class;
-		} else if(columnType == 6) {
+		} else if(columnType == Types.FLOAT) {
 			type = double.class;
-		} else if(columnType == 8) {
+		} else if(columnType == Types.DOUBLE) {
 			type = double.class;
-		} else if(columnType == -2) {
+		} else if(columnType == Types.BINARY) {
 			type = byte[].class;
-		} else if(columnType == -3) {
+		} else if(columnType == Types.VARBINARY) {
 			type = byte[].class;
-		} else if(columnType == -4) {
+		} else if(columnType == Types.LONGVARBINARY) {
 			type = byte[].class;
-		} else if(columnType == 91) {
+		} else if(columnType == Types.DATE) {
 			type = java.sql.Date.class;
-		} else if(columnType == 92) {
+		} else if(columnType == Types.TIME) {
 			type = java.sql.Time.class;
-		} else if(columnType == 93) {
+		} else if(columnType == Types.TIMESTAMP) {
 			type = java.sql.Timestamp.class;
-		} else if(columnType == 1) {
+		} else if(columnType == Types.CHAR) {
 			type = String.class;
-		} else if(columnType == -16) {
+		} else if(columnType == Types.LONGNVARCHAR) {
 			type = String.class;
-		} else if(columnType == -1) {
+		} else if(columnType == Types.LONGVARCHAR) {
 			type = String.class;
-		} else if(columnType == -15) {
+		} else if(columnType == Types.NCHAR) {
 			type = String.class;
-		} else if(columnType == 12) {
+		} else if(columnType == Types.VARCHAR) {
 			type = String.class;
 		} else {
 			type = Object.class;
@@ -117,7 +119,7 @@ public class DataTable {
 		return type;
 	}
 	
-	private void FillRows(ResultSet rs) throws SQLException {
+	private void fillRows(ResultSet rs) throws SQLException {
 		while(rs.next()) {
 			DataRow row = new DataRow();
 			row.setTable(this);
@@ -127,15 +129,15 @@ public class DataTable {
 			for(DataColumn col : this.columns) {
 				String colName = col.getColumnName();
 				Object cellValue = rs.getObject(colName);
-				row.SetCellValue(colName, cellValue);
+				row.setCellValue(colName, cellValue);
 			}
 			this.rows.add(row);
 		}
-		this.AcceptChanged();
+		this.acceptChanged();
 	}
 	
-	public List<Object[]> ToItemArrays(){
-		List<Object[]> arrayData = new ArrayList<>();
+	public List<Map<String, Object>> toItemArrays(){
+		List<Map<String, Object>> arrayData = new ArrayList<>();
 		for(int i = 0; i < this.rows.size(); i++) {
 			DataRow row = this.rows.get(i);
 			if(row.getRowState() == DataRowState.Deleted) {
@@ -143,14 +145,18 @@ public class DataTable {
 			} else if(row.getRowState() == DataRowState.Detached) {
 				continue;
 			} else {
-				arrayData.add(row.getItemsCurrent());
+				Map<String, Object> rowData = new HashMap<>();
+				for(DataColumn col : this.getColumns()) {
+					rowData.put(col.getColumnName(), row.getCellValue(col.getColumnName()));
+				}
+				arrayData.add(rowData);
 			}
 		}
 		return arrayData;
 	}
 	
-	public DataRow NewRow() {
-		DataRow row = DataRow.New();
+	public DataRow newRow() {
+		DataRow row = DataRow.newRow();
 		row.setTable(this);
 		Object[] itemArray = new Object[this.columns.size()];
 		row.setItemsOriginal(itemArray);
@@ -158,7 +164,7 @@ public class DataTable {
 		return row;
 	}
 	
-	public int GetColumnIndex(String columnName) {
+	public int getColumnIndex(String columnName) {
 		int colIndex = -1;
 		for(int i = 0; i < columns.size(); i++) {
 			DataColumn col = columns.get(i);
@@ -170,13 +176,13 @@ public class DataTable {
 		return colIndex;
 	}
 
-	public void AcceptChanged() {
+	public void acceptChanged() {
 		for(DataRow row : rows) {
-			row.AcceptChanges();
+			row.acceptChanges();
 		}
 	}
 	
-	public void Clear() {
+	public void clear() {
 		this.rows.clear();
 	}
 }

@@ -36,19 +36,19 @@ public class DataRow {
 	
 	public DataRow() {}
 	
-	public static DataRow New() {
+	public static DataRow newRow() {
 		DataRow row = new DataRow();
 		row.rowState = DataRowState.Added;
 		return row;
 	}
 	
-	public Object GetCellValue(String columnName) {
-		int colIndex = this.table.GetColumnIndex(columnName);
+	public Object getCellValue(String columnName) {
+		int colIndex = this.table.getColumnIndex(columnName);
 		return itemsCurrent[colIndex];
 	}
 	
-	public Object GetCellValue(String columnName, DataRowVersion version) {
-		int colIndex = this.table.GetColumnIndex(columnName);
+	public Object getCellValue(String columnName, DataRowVersion version) {
+		int colIndex = this.table.getColumnIndex(columnName);
 		if(version == DataRowVersion.Current) {
 			return itemsCurrent[colIndex];
 		} else if(version == DataRowVersion.Original) {
@@ -58,15 +58,15 @@ public class DataRow {
 		}
 	}
 	
-	public void SetCellValue(String columnName, Object value) {
-		int colIndex = this.table.GetColumnIndex(columnName);
+	public void setCellValue(String columnName, Object value) {
+		int colIndex = this.table.getColumnIndex(columnName);
 		itemsCurrent[colIndex] = value;
 		if(this.rowState == DataRowState.Unchanged) {
 			this.rowState = DataRowState.Modified;
 		}
 	}
 	
-	public void Delete() {
+	public void delete() {
 		if(this.rowState == DataRowState.Added) {
 			this.rowState = DataRowState.Detached;
 			List<DataRow> rows = this.table.getRows();
@@ -78,7 +78,7 @@ public class DataRow {
 		}
 	}
 	
-	public void AcceptChanges() {
+	public void acceptChanges() {
 		this.itemsOriginal = this.itemsCurrent;
 		this.rowState = DataRowState.Unchanged;
 	}
