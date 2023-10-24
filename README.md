@@ -48,6 +48,7 @@ List<Map<String, Object>> rows = dt.toItemArrays();  //pass rows into org.json.J
 ## Devlog
 2022.10.30
 1. First commit with the basic functionalities of DataTable.
+
 2023.10.24
 1. Adopt camal casing in naming methods.
 2. Added 'toItemArrays' method to DataTable class.
