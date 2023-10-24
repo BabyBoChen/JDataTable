@@ -1,5 +1,5 @@
 # JDataTable
- An ado.net-like Datatable class implemented in Java
+ An ado.net-inspired DataTable class implemented in Java
  
 ## Download com-bblj-jdatatable.jar
 https://drive.google.com/file/d/1IkpuZArKN4-jamdlpKYT0sqnFaSMIF3F/view?usp=sharing
